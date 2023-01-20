@@ -10,6 +10,7 @@ services:
         - ALPINE_VERSION=${ALPINE_VERSION}
     volumes:
       - ansible_homedir:/root
+      - ./playbook.yml:/root/playbook.yml
 
 volumes:
   ansible_homedir:

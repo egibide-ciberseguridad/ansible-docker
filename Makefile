@@ -12,8 +12,9 @@ help: _header
 	@echo Opciones:
 	@echo ------------------------------------------
 	@echo build
-	@echo workspace
 	@echo ssh
+	@echo deploy
+	@echo workspace
 	@echo clean
 	@echo ------------------------------------------
 
@@ -25,11 +26,14 @@ _header:
 build:
 	@docker compose build ansible
 
-workspace:
-	@docker compose run --rm ansible /bin/sh
-
 ssh:
 	@docker compose run --rm ansible generar_clave.sh ${REMOTE_HOST}
+
+deploy:
+	@docker compose run --rm ansible ansible-playbook -i "${REMOTE_HOST}," playbook.yml --extra-vars "UBUNTU_RELEASE=${UBUNTU_RELEASE}"
+
+workspace:
+	@docker compose run --rm ansible /bin/sh
 
 clean:
 	@docker compose down -v --remove-orphans
