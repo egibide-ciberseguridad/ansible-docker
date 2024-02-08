@@ -4,6 +4,8 @@
     ansible_python_interpreter: /usr/bin/python3
   become: true
   tasks:
+
+    # Instalación de Docker
     - name: Instalar los paquetes necesarios para que apt funcione sobre HTTPS
       apt:
         name: "{{ packages }}"
@@ -11,20 +13,23 @@
         update_cache: yes
       vars:
         packages:
-          - apt-transport-https
           - ca-certificates
           - curl
-          - gnupg-agent
-          - software-properties-common
+          - gnupg
+          - lsb-release
 
-    - name: Añadir la clave de firma de paquetes de Docker
-      apt_key:
+    - name: Descargar la clave de firma de paquetes de Docker
+      get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+        dest: /etc/apt/trusted.gpg.d/docker.asc
+
+    - name: Obtener el código de versión de Ubuntu
+      shell: lsb_release -cs
+      register: ubuntu_release
 
     - name: Añadir el repositorio apt para la versión estable
       apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu {{ UBUNTU_RELEASE }} stable
+        repo: deb [signed-by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/ubuntu {{ UBUNTU_RELEASE }} stable
         state: present
 
     - name: Instalar Docker y sus dependencias
@@ -37,6 +42,7 @@
           - docker-ce
           - docker-ce-cli
           - containerd.io
+          - docker-buildx-plugin
           - docker-compose-plugin
 
     - name: Arrancar el servicio Docker
@@ -44,3 +50,57 @@
         name: docker
         state: started
         enabled: yes
+
+    - name: Parche para que containerd arranque correctamente
+      ansible.builtin.shell: |
+        containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1
+        sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+    - name: Reiniciar containerd
+      service:
+        name: containerd
+        daemon_reload: yes
+        state: restarted
+
+    - name: Crear el alias para el comando docker-compose
+      ansible.builtin.shell: |
+        echo 'docker compose "$@"' > /bin/docker-compose
+        chmod +x /bin/docker-compose
+
+    # Crear un usuario sin privilegios
+    - name: Añadir el grupo ubuntu con GID 1000
+      group:
+        name: ubuntu
+        gid: 1000
+        state: present
+
+    - name: Añadir el usuario ubuntu con UID 1000
+      ansible.builtin.user:
+        name: ubuntu
+        shell: /bin/bash
+        uid: 1000
+        group: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Permitir sudo sin contraseña
+      copy:
+        content: 'ubuntu ALL=(ALL:ALL) NOPASSWD:ALL'
+        dest: /etc/sudoers.d/ubuntu_nopasswd
+        mode: 0440
+
+    - name: Crear el directorio .ssh del usuario ubuntu
+      file:
+        path: /home/ubuntu/.ssh
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Copiar el fichero authorized_keys del root a ubuntu
+      ansible.builtin.copy:
+        src: /root/.ssh/authorized_keys
+        dest: /home/ubuntu/.ssh/authorized_keys
+        remote_src: yes
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'
