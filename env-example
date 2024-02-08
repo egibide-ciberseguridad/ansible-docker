@@ -1,3 +1,3 @@
-ALPINE_VERSION=3.17
-REMOTE_HOST=docker.ciber-egibide.eu
+ALPINE_VERSION=3.19
+REMOTE_HOST=demo.ciber-egibide.eu
 UBUNTU_RELEASE=jammy
