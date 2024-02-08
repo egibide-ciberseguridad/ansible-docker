@@ -12,7 +12,7 @@ help: _header
 	@echo Opciones:
 	@echo ------------------------------------------
 	@echo build
-	@echo ssh
+	@echo ssh-key
 	@echo deploy
 	@echo workspace
 	@echo clean
@@ -26,7 +26,7 @@ _header:
 build:
 	@docker compose build ansible
 
-ssh:
+ssh-key:
 	@docker compose run --rm ansible generar_clave.sh ${REMOTE_HOST}
 
 deploy:

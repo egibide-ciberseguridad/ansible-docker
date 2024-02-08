@@ -15,7 +15,7 @@ Instalar [Docker](https://www.docker.com) en una máquina Ubuntu remota mediante
 3. Crear la clave SSH para el host remoto:
 
     ```shell
-    make ssh
+    make ssh-key
     ```
 
 4. Lanzar el playbook sobre el host remoto:
