@@ -1,22 +1,14 @@
 #!make
 
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-else
-$(error No se encuentra el fichero .env)
-endif
-
 help: _header
 	${info }
 	@echo Opciones:
-	@echo ------------------------------------------
+	@echo ---------
 	@echo build
 	@echo ssh-key
-	@echo deploy
 	@echo workspace
 	@echo clean
-	@echo ------------------------------------------
+	@echo ---------
 
 _header:
 	@echo -------
@@ -24,16 +16,13 @@ _header:
 	@echo -------
 
 build:
-	@docker compose build ansible
-
-ssh-key:
-	@docker compose run --rm ansible generar_clave.sh ${REMOTE_HOST}
-
-deploy:
-	@docker compose run --rm ansible ansible-playbook -i "${REMOTE_HOST}," playbook.yml --extra-vars "UBUNTU_RELEASE=${UBUNTU_RELEASE}"
+	@docker compose build --pull
 
 workspace:
-	@docker compose run --rm ansible /bin/sh
+	@docker compose run --rm ansible
+
+ssh-key:
+	@docker compose run --rm ansible generar_clave.sh
 
 clean:
 	@docker compose down -v --remove-orphans

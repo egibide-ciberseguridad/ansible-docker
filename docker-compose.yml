@@ -1,16 +1,17 @@
-version: "3.5"
-
 services:
-
   ansible:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - ALPINE_VERSION=${ALPINE_VERSION}
+    build: .
+    hostname: workspace
     volumes:
-      - ansible_homedir:/root
-      - ./playbook.yml:/root/playbook.yml
+      - ./ansible:/ansible
+      - homedir:/root
 
 volumes:
-  ansible_homedir:
+  homedir:
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${DOCKER_SUBNET:-10.131.0.0/24}
