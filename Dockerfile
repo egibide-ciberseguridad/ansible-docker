@@ -14,6 +14,10 @@ RUN chmod +x /usr/local/bin/generar_clave.sh
 # Definir el directorio actual
 WORKDIR /ansible
 
+# Variables de entorno de Ansible
+ENV ANSIBLE_HOST_KEY_CHECKING=false
+ENV ANSIBLE_PYTHON_INTERPRETER=auto_silent
+
 # Mostrar el usuario y el host en el prompt
 ENV PS1='\u@\h:\w\$\040'
 
