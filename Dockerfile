@@ -3,7 +3,7 @@ ARG ALPINE_VERSION=latest
 FROM alpine:${ALPINE_VERSION}
 
 # Instalar los paquetes necesarios
-RUN apk add --no-cache ansible openssh bash shadow && \
+RUN apk add --no-cache ansible openssh bash shadow nano && \
     chsh root --shell /bin/bash && \
     apk del shadow
 
