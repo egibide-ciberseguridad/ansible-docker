@@ -5,7 +5,6 @@ help: _header
 	@echo Opciones:
 	@echo ---------
 	@echo build
-	@echo ssh-key
 	@echo workspace
 	@echo clean
 	@echo ---------
@@ -20,9 +19,6 @@ build:
 
 workspace:
 	@docker compose run --rm ansible
-
-ssh-key:
-	@docker compose run --rm ansible generar_clave.sh
 
 clean:
 	@docker compose down -v --remove-orphans

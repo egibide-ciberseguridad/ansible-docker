@@ -1,0 +1,2 @@
+# Clave privada para usar dentro del workspace
+ID_RSA=/home/user/.ssh/id_rsa

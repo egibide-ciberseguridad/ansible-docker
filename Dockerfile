@@ -7,10 +7,6 @@ RUN apk add --no-cache ansible openssh bash shadow nano && \
     chsh root --shell /bin/bash && \
     apk del shadow
 
-# Copiar el script para crear la clave SSH
-COPY generar_clave.sh /usr/local/bin/generar_clave.sh
-RUN chmod +x /usr/local/bin/generar_clave.sh
-
 # Definir el directorio actual
 WORKDIR /ansible
 

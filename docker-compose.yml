@@ -5,6 +5,7 @@ services:
     volumes:
       - ./ansible:/ansible
       - homedir:/root
+      - ${ID_RSA:-./dummy_id_rsa}:/root/.ssh/id_rsa:ro
 
 volumes:
   homedir:
